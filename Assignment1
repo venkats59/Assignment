@@ -1,0 +1,191 @@
+[root@ip-172-31-13-6 k8s-specifications]# ls
+db-deployment.yaml     redis-service.yaml      vote-deployment.yaml
+db-service.yaml        result-deployment.yaml  vote-service.yaml
+redis-deployment.yaml  result-service.yaml     worker-deployment.yaml
+[root@ip-172-31-13-6 k8s-specifications]# vi vote-service.yaml
+[root@ip-172-31-13-6 k8s-specifications]# vi result-service.yaml
+[root@ip-172-31-13-6 k8s-specifications]# kubectl apply -f .
+deployment.apps/db created
+service/db created
+deployment.apps/redis created
+service/redis created
+deployment.apps/result created
+service/result created
+deployment.apps/vote created
+service/vote created
+deployment.apps/worker created
+[root@ip-172-31-13-6 k8s-specifications]# kubectl get all
+NAME                          READY   STATUS    RESTARTS   AGE
+pod/db-b54cd94f4-w82cs        1/1     Running   0          15s
+pod/kubia-manual              1/1     Running   0          7d2h
+pod/kubia-manual-v2           1/1     Running   0          6d5h
+pod/kubia2-bfwz9              1/1     Running   0          6d4h
+pod/kubia2-z7pkb              1/1     Running   0          6d4h
+pod/nginx-shatru              1/1     Running   0          7d4h
+pod/redis-868d64d78-jr2vz     1/1     Running   0          15s
+pod/result-5d57b59f4b-t8dvj   1/1     Running   0          15s
+pod/vote-94849dc97-8w9nl      1/1     Running   0          15s
+pod/worker-dd46d7584-9kzjn    1/1     Running   0          15s
+
+NAME                           DESIRED   CURRENT   READY   AGE
+replicationcontroller/kubia2   3         3         3       6d4h
+
+NAME                 TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                                                                                       AGE
+service/db           ClusterIP   10.100.111.107   <none>        5432/TCP                                                                                      15s
+service/kubernetes   ClusterIP   10.96.0.1        <none>        443/TCP                                                                                       8d
+service/redis        ClusterIP   10.102.201.180   <none>        6379/TCP                                                                                      15s
+service/result       NodePort    10.103.183.7     <none>        5001:31003/TCP                                                                                15s
+service/vote         NodePort    10.104.34.129    <none>        5000:31002/TCP                                                                                15s
+
+NAME                     READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/db       1/1     1            1           15s
+deployment.apps/redis    1/1     1            1           15s
+deployment.apps/result   1/1     1            1           15s
+deployment.apps/vote     1/1     1            1           15s
+deployment.apps/worker   1/1     1            1           15s
+
+NAME                                DESIRED   CURRENT   READY   AGE
+replicaset.apps/db-b54cd94f4        1         1         1       15s
+replicaset.apps/redis-868d64d78     1         1         1       15s
+replicaset.apps/result-5d57b59f4b   1         1         1       15s
+replicaset.apps/vote-94849dc97      1         1         1       15s
+replicaset.apps/worker-dd46d7584    1         1         1       15s
+[root@ip-172-31-13-6 k8s-specifications]#
+
+
+
+
+
+// Obervation:
+voting APP created: ports vote service is 31002 and  result serviec is 31003 ,
+open both webpages http://13.214.172.86:31002/ and http://13.214.172.86:31003/.
+Voting done and observe the result.
+
+Deleted vote POD and no impact observed as pod created again.
+
+
+
+[root@ip-172-31-13-6 ~]# kubectl delete po worker-dd46d7584-9kzjn
+pod "worker-dd46d7584-9kzjn" deleted
+[root@ip-172-31-13-6 ~]# kubectl get all
+NAME                          READY   STATUS    RESTARTS   AGE
+pod/db-b54cd94f4-w82cs        1/1     Running   0          11m
+pod/kubia-manual              1/1     Running   0          7d2h
+pod/kubia-manual-v2           1/1     Running   0          6d5h
+pod/kubia2-bfwz9              1/1     Running   0          6d4h
+pod/kubia2-z7pkb              1/1     Running   0          6d4h
+pod/nginx-shatru              1/1     Running   0          7d4h
+pod/redis-868d64d78-jr2vz     1/1     Running   0          11m
+pod/result-5d57b59f4b-t8dvj   1/1     Running   0          11m
+pod/vote-94849dc97-8tcnx      1/1     Running   0          2m1s
+pod/worker-dd46d7584-vbnxh    1/1     Running   0          49s
+
+NAME                           DESIRED   CURRENT   READY   AGE
+replicationcontroller/kubia2   3         3         3       6d4h
+
+NAME                 TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+service/db           ClusterIP   10.100.111.107   <none>        5432/TCP         11m
+service/kubernetes   ClusterIP   10.96.0.1        <none>        443/TCP          8d
+service/redis        ClusterIP   10.102.201.180   <none>        6379/TCP         11m
+service/result       NodePort    10.103.183.7     <none>        5001:31003/TCP   11m
+service/vote         NodePort    10.104.34.129    <none>        5000:31002/TCP   11m
+
+NAME                     READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/db       1/1     1            1           11m
+deployment.apps/redis    1/1     1            1           11m
+deployment.apps/result   1/1     1            1           11m
+deployment.apps/vote     1/1     1            1           11m
+deployment.apps/worker   1/1     1            1           11m
+
+NAME                                DESIRED   CURRENT   READY   AGE
+replicaset.apps/db-b54cd94f4        1         1         1       11m
+replicaset.apps/redis-868d64d78     1         1         1       11m
+replicaset.apps/result-5d57b59f4b   1         1         1       11m
+replicaset.apps/vote-94849dc97      1         1         1       11m
+replicaset.apps/worker-dd46d7584    1         1         1       11m
+[root@ip-172-31-13-6 ~]#
+
+
+// Deleted worker POD and no impact observed as pod created again.
+
+
+
+[root@ip-172-31-13-6 ~]# kubectl delete po db-b54cd94f4-w82cs
+pod "db-b54cd94f4-w82cs" deleted
+[root@ip-172-31-13-6 ~]#
+[root@ip-172-31-13-6 ~]# kubectl get all
+NAME                          READY   STATUS    RESTARTS   AGE
+pod/db-b54cd94f4-6zmq4        1/1     Running   0          39s
+pod/kubia-manual              1/1     Running   0          7d2h
+pod/kubia-manual-v2           1/1     Running   0          6d5h
+pod/kubia2-bfwz9              1/1     Running   0          6d4h
+pod/kubia2-z7pkb              1/1     Running   0          6d4h
+pod/nginx-shatru              1/1     Running   0          7d5h
+pod/redis-868d64d78-jr2vz     1/1     Running   0          13m
+pod/result-5d57b59f4b-t8dvj   1/1     Running   0          13m
+pod/vote-94849dc97-8tcnx      1/1     Running   0          4m45s
+pod/worker-dd46d7584-vbnxh    1/1     Running   1          3m33s
+
+NAME                           DESIRED   CURRENT   READY   AGE
+replicationcontroller/kubia2   3         3         3       6d4h
+
+NAME                 TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+service/db           ClusterIP   10.100.111.107   <none>        5432/TCP         13m
+service/kubernetes   ClusterIP   10.96.0.1        <none>        443/TCP          8d
+service/redis        ClusterIP   10.102.201.180   <none>        6379/TCP         13m
+service/result       NodePort    10.103.183.7     <none>        5001:31003/TCP   13m
+service/vote         NodePort    10.104.34.129    <none>        5000:31002/TCP   13m
+
+NAME                     READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/db       1/1     1            1           13m
+deployment.apps/redis    1/1     1            1           13m
+deployment.apps/result   1/1     1            1           13m
+deployment.apps/vote     1/1     1            1           13m
+deployment.apps/worker   1/1     1            1           13m
+
+NAME                                DESIRED   CURRENT   READY   AGE
+replicaset.apps/db-b54cd94f4        1         1         1       13m
+replicaset.apps/redis-868d64d78     1         1         1       13m
+replicaset.apps/result-5d57b59f4b   1         1         1       13m
+replicaset.apps/vote-94849dc97      1         1         1       13m
+replicaset.apps/worker-dd46d7584    1         1         1       13m
+[root@ip-172-31-13-6 ~]#
+
+// when delete DB pod: vote can be given and result page not updating
+worker pod restarted.
+
+
+[root@ip-172-31-13-6 ~]# kubectl get po
+NAME                      READY   STATUS    RESTARTS   AGE
+db-b54cd94f4-6zmq4        1/1     Running   0          3m26s
+kubia-manual              1/1     Running   0          7d2h
+kubia-manual-v2           1/1     Running   0          6d5h
+kubia2-bfwz9              1/1     Running   0          6d4h
+kubia2-z7pkb              1/1     Running   0          6d4h
+nginx-shatru              1/1     Running   0          7d5h
+redis-868d64d78-jr2vz     1/1     Running   0          16m
+result-5d57b59f4b-t8dvj   1/1     Running   0          16m
+vote-94849dc97-8tcnx      1/1     Running   0          7m32s
+worker-dd46d7584-vbnxh    1/1     Running   1          6m20s
+[root@ip-172-31-13-6 ~]# kubectl delete po result-5d57b59f4b-t8dvj
+pod "result-5d57b59f4b-t8dvj" deleted
+[root@ip-172-31-13-6 ~]# kubectl get po
+NAME                      READY   STATUS    RESTARTS   AGE
+db-b54cd94f4-6zmq4        1/1     Running   0          5m9s
+kubia-manual              1/1     Running   0          7d2h
+kubia-manual-v2           1/1     Running   0          6d5h
+kubia2-bfwz9              1/1     Running   0          6d4h
+kubia2-z7pkb              1/1     Running   0          6d4h
+nginx-shatru              1/1     Running   0          7d5h
+redis-868d64d78-jr2vz     1/1     Running   0          18m
+result-5d57b59f4b-l8mnx   1/1     Running   0          88s
+vote-94849dc97-8tcnx      1/1     Running   0          9m15s
+worker-dd46d7584-vbnxh    1/1     Running   1          8m3s
+[root@ip-172-31-13-6 ~]#
+
+
+// the result page not respoding, so gave restart to result pod and results start updating.
+
+
+
+
